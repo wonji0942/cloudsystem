@@ -1,8 +1,29 @@
 // src/pages/specificpage.jsx
-import React from "react";
+import React, { useEffect } from "react";
 import "../App.css";
 
 export default function SpecificPage() {
+  useEffect(() => {
+      if (window.kakao && window.kakao.maps) {
+        const container = document.getElementById("map");
+        const options = {
+          center: new window.kakao.maps.LatLng(37.545419, 126.964649), //마커 기능 추가한 지도
+          level: 3,
+        };
+        const map = new window.kakao.maps.Map(container, options);
+
+        let markerPosition  = new window.kakao.maps.LatLng(37.545419, 126.964649);  
+        // 마커 위치   
+        // 추후 백엔드 위치 데이터를 받아와서 입력하는 것으로 수정
+
+        let marker = new window.kakao.maps.Marker({
+            position: markerPosition
+        });
+
+        marker.setMap(map); //마커 표시
+      }
+  }, []);
+
   return (
     <div className="specific-page">
       {/* 상단 공통 헤더 */}
@@ -55,11 +76,10 @@ export default function SpecificPage() {
             </div>
           </div>
 
-          {/* 오른쪽 지도 (나중에 API 연동) */}
+          {/* 오른쪽 지도 (나중에 API 연동) -> 연동 완료 */}
           <div className="specific-map-box">
             <div className="specific-map-placeholder">
-              {/* 여기 안을 나중에 지도 API 컴포넌트로 교체하면 됨 */}
-              지도 영역 (API 연동 예정)
+              <div id="map" style={{width:"100%", height:"400px"}}></div> 
             </div>
           </div>
         </section>

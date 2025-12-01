@@ -14,15 +14,7 @@ export default function Record() {
   return (
     <div className="record-page">
       {/* 상단 파란 헤더 */}
-      <header className="main-header">
-        <div className="main-header-logo">MyRun</div>
-        <button className="main-header-menu">
-          <span />
-          <span />
-          <span />
-        </button>
-      </header>
-
+      
       <main className="record-main">
         <h1 className="record-title">나의 러닝 기록하기</h1>
 

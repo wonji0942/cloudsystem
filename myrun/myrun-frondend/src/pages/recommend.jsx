@@ -21,15 +21,6 @@ export default function Recommend() {
 
   return (
     <div className="recommend-page">
-      {/* 상단 파란 헤더 */}
-      <header className="main-header">
-        <div className="main-header-logo">MyRun</div>
-        <button className="main-header-menu">
-          <span />
-          <span />
-          <span />
-        </button>
-      </header>
 
       <main className="recommend-main">
         <div className="recommend-layout">

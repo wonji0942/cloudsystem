@@ -27,14 +27,6 @@ export default function SpecificPage() {
   return (
     <div className="specific-page">
       {/* 상단 공통 헤더 */}
-      <header className="main-header">
-        <div className="main-header-logo">MyRun</div>
-        <button className="main-header-menu">
-          <span />
-          <span />
-          <span />
-        </button>
-      </header>
 
       <main className="specific-main">
         {/* 상단 러닝 기록 한 줄 요약 테이블 */}

@@ -7,10 +7,12 @@ import Record from "./pages/record.jsx";
 import Recommend from "./pages/recommend.jsx";
 import MyPage from "./pages/mypage.jsx";
 import SpecificPage from "./pages/specific.jsx";
+import Header from "./pages/header.jsx";
 
 function App() {
   return (
     <BrowserRouter>
+      <Header />
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/main" element={<Main />} />

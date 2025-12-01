@@ -8,14 +8,7 @@ export default function Main() {
   return (
     <div className="main-page">
       {/* 상단 파란 헤더 */}
-      <header className="main-header">
-        <div className="main-header-logo">MyRun</div>
-        <button className="main-header-menu">
-          <span />
-          <span />
-          <span />
-        </button>
-      </header>
+      <header/>
 
       {/* 가운데 내용 */}
       <div className="main-layout">

@@ -14,14 +14,6 @@ export default function MyPage() {
   return (
     <div className="mypage-page">
       {/* 상단 헤더는 메인/코스 추천과 동일 스타일 재사용 */}
-      <header className="main-header">
-        <div className="main-header-logo">MyRun</div>
-        <button className="main-header-menu">
-          <span />
-          <span />
-          <span />
-        </button>
-      </header>
 
       <main className="mypage-main">
         {/* 위쪽 그래프 카드 3개 */}

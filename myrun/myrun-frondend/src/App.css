@@ -13,7 +13,8 @@ body {
 /* ===== 로그인 페이지 레이아웃 ===== */
 
 .login-page {
-  min-height: 100vh;
+  min-height: 75vh;
+  width: 100vw;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -65,7 +66,8 @@ body {
   border-radius: 14px;
   background-color: #f7f7f7;
   font-size: 16px;
-  color: #111827;          /* ⬅ 입력되는 글자 색: 진한 검정 */
+  color: #111827;
+  /* ⬅ 입력되는 글자 색: 진한 검정 */
 }
 
 .small-input {
@@ -76,7 +78,8 @@ body {
   border-radius: 14px;
   background-color: #f7f7f7;
   font-size: 15px;
-  color: #111827;          /* ⬅ 숫자 입력 글자 색도 검정 */
+  color: #111827;
+  /* ⬅ 숫자 입력 글자 색도 검정 */
 }
 
 .field-input:focus {
@@ -101,13 +104,17 @@ body {
 
 /* 로그인 페이지의 파란 로그인 버튼 */
 .login-submit-btn {
-  margin: 24px auto 0;     /* 위쪽 여백 + 좌우 auto → 가운데 정렬 */
-  display: block;          /* 가운데 정렬 위해 block */
-  width: 220px;            /* 버튼 가로 길이 (원하면 조절 가능) */
+  margin: 24px auto 0;
+  /* 위쪽 여백 + 좌우 auto → 가운데 정렬 */
+  display: block;
+  /* 가운데 정렬 위해 block */
+  width: 220px;
+  /* 버튼 가로 길이 (원하면 조절 가능) */
   height: 56px;
   border: none;
   border-radius: 14px;
-  background-color: #4c8dff;  /* 진한 파란색 */
+  background-color: #4c8dff;
+  /* 진한 파란색 */
   color: #ffffff;
   font-size: 17px;
   font-weight: 600;
@@ -115,7 +122,8 @@ body {
 }
 
 .login-submit-btn:hover {
-  background-color: #3c7ae6;  /* 살짝 어두운 파란색 */
+  background-color: #3c7ae6;
+  /* 살짝 어두운 파란색 */
 }
 
 .link-button:hover {
@@ -125,7 +133,8 @@ body {
 /* ===== 메인 페이지 ===== */
 
 .main-page {
-  min-height: 100vh;
+  min-height: 75vh;
+  width: 100vw;
   background-color: #f5f5f5;
 }
 
@@ -241,7 +250,8 @@ body {
 /* ===== 회원가입 페이지 ===== */
 
 .join-page {
-  min-height: 100vh;
+  min-height: 75vh;
+  width: 100vw;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -282,13 +292,15 @@ body {
 .form-row-inline {
   display: flex;
   align-items: center;
-  gap: 24px;        /* 그룹 사이 간격 */
+  gap: 24px;
+  /* 그룹 사이 간격 */
 }
 
 .inline-group {
   display: flex;
   align-items: center;
-  gap: 8px;         /* 레이블 - 인풋 사이 간격 */
+  gap: 8px;
+  /* 레이블 - 인풋 사이 간격 */
 }
 
 .small-label {
@@ -322,7 +334,8 @@ body {
 }
 
 .radio-wrapper span {
-  color: #111827;       /* 남자 / 여자 글자 색 진하게 */
+  color: #111827;
+  /* 남자 / 여자 글자 색 진하게 */
 }
 
 .gender-radio {
@@ -371,13 +384,16 @@ body {
 /* ===== 러닝 기록하기 페이지 ===== */
 
 .record-page {
-  min-height: 100vh;
+  min-height: 75vh;
+  width: 100vw;
   background-color: #f5f5f5;
-  color: #111827;             /* 전체 기본 글씨색: 진한 검정 */
+  color: #111827;
+  /* 전체 기본 글씨색: 진한 검정 */
 }
 
 .record-main {
-  max-width: 700px;           /* 🔹 폼 폭 넓게 */
+  max-width: 700px;
+  /* 🔹 폼 폭 넓게 */
   margin: 60px auto 80px;
   text-align: center;
 }
@@ -387,7 +403,8 @@ body {
   margin: 40px 0 32px;
   font-size: 32px;
   font-weight: 700;
-  color: #111827;             /* 제목도 검정 */
+  color: #111827;
+  /* 제목도 검정 */
 }
 
 /* 폼 전체 */
@@ -410,7 +427,8 @@ body {
   text-align: right;
   font-size: 18px;
   font-weight: 500;
-  color: #111827;             /* 라벨 글씨 검정 */
+  color: #111827;
+  /* 라벨 글씨 검정 */
 }
 
 /* 공통 인풋 스타일 */
@@ -423,7 +441,8 @@ body {
   background-color: #f7f7f7;
   font-size: 18px;
   text-align: center;
-  color: #111827;             /* 입력 글씨 검정 */
+  color: #111827;
+  /* 입력 글씨 검정 */
 }
 
 /* 거리 + km 단위 같이 있는 칸 */
@@ -447,7 +466,8 @@ body {
   border-left: none;
   background-color: #f7f7f7;
   font-size: 18px;
-  color: #111827;             /* km 글씨도 검정 */
+  color: #111827;
+  /* km 글씨도 검정 */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -462,7 +482,8 @@ body {
   border: 1px solid #e5e7eb;
   background-color: #f7f7f7;
   font-size: 16px;
-  color: #111827;             /* 코스 정보 입력 글씨도 검정 */
+  color: #111827;
+  /* 코스 정보 입력 글씨도 검정 */
   resize: none;
 }
 
@@ -487,7 +508,8 @@ body {
 /* ===== 코스 추천 페이지 ===== */
 
 .recommend-page {
-  min-height: 100vh;
+  min-height: 75vh;
+  width: 100vw;
   background-color: #f5f5f5;
 }
 
@@ -528,7 +550,8 @@ body {
   padding: 24px 24px 28px;
   border-radius: 24px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  color: #111827; /* 안의 글씨 기본색 */
+  color: #111827;
+  /* 안의 글씨 기본색 */
 }
 
 /* ===== 코스 추천 페이지 전용 필터 스타일 ===== */
@@ -537,23 +560,28 @@ body {
 .recommend-filters {
   display: flex;
   align-items: center;
-  gap: 32px;           /* 거리 / 난이도 / 지역 그룹 사이 간격 */
+  gap: 32px;
+  /* 거리 / 난이도 / 지역 그룹 사이 간격 */
 }
 
 /* 각 그룹: [레이블] [셀렉트박스] 를 가로로 정렬 */
 .recommend-filters .filter-group {
   display: flex;
   align-items: center;
-  gap: 12px;           /* "거리" 글자와 셀렉트 사이 간격 */
+  gap: 12px;
+  /* "거리" 글자와 셀렉트 사이 간격 */
 }
 
 /* 레이블이 세로로 안 꺾이게 고정 */
 .recommend-filters .filter-label {
-  white-space: nowrap; /* 줄바꿈 금지! */
-  min-width: 40px;     /* 폭을 조금 넉넉하게 */
+  white-space: nowrap;
+  /* 줄바꿈 금지! */
+  min-width: 40px;
+  /* 폭을 조금 넉넉하게 */
   font-size: 18px;
   font-weight: 700;
-  color: #111827;      /* 검정 */
+  color: #111827;
+  /* 검정 */
 }
 
 .filter-group {
@@ -565,7 +593,8 @@ body {
 .filter-label {
   font-size: 18px;
   font-weight: 700;
-  color: #111827; /* 거리 / 난이도 / 지역 글씨 진하게 */
+  color: #111827;
+  /* 거리 / 난이도 / 지역 글씨 진하게 */
   white-space: nowrap;
 }
 
@@ -580,8 +609,10 @@ body {
   background-color: #f5f5f5;
   padding: 8px 32px 8px 16px;
   font-size: 14px;
-  color: #111827;         /* 선택값 글씨도 검정 */
-  appearance: none;       /* 기본 select 화살표 숨김 */
+  color: #111827;
+  /* 선택값 글씨도 검정 */
+  appearance: none;
+  /* 기본 select 화살표 숨김 */
   outline: none;
 }
 
@@ -612,7 +643,8 @@ body {
   border-radius: 20px;
   background-color: #f5f5f5;
   font-size: 16px;
-  color: #111827;     /* 코스 이름 / 거리 / 난이도 / 지역 글씨 검정 */
+  color: #111827;
+  /* 코스 이름 / 거리 / 난이도 / 지역 글씨 검정 */
 }
 
 /* 선택된 코스 (하늘색 줄) */
@@ -625,10 +657,12 @@ body {
 .course-row-empty {
   background-color: #f5f5f5;
 }
+
 /* ===== 마이페이지 레이아웃 ===== */
 
 .mypage-page {
-  min-height: 100vh;
+  min-height: 75vh;
+  width: 100vw;
   background-color: #f5f5f5;
 }
 
@@ -689,7 +723,8 @@ body {
 .mypage-table td {
   padding: 14px 28px;
   font-size: 15px;
-  color: #111827;   /* 검정 */
+  color: #111827;
+  /* 검정 */
 }
 
 /* 헤더 배경 */
@@ -702,6 +737,7 @@ body {
 .mypage-table tbody .mypage-row:nth-child(odd) {
   background-color: #f9fafb;
 }
+
 .mypage-table tbody .mypage-row:nth-child(even) {
   background-color: #ffffff;
 }
@@ -714,10 +750,12 @@ body {
 .clickable-row:hover {
   background-color: #dbeafe;
 }
+
 /* ===== 상세 페이지(specificpage) ===== */
 
 .specific-page {
-  min-height: 100vh;
+  min-height: 75vh;
+  width: 100vw;
   background-color: #f5f5f5;
 }
 
@@ -743,7 +781,8 @@ body {
 .specific-table td {
   padding: 14px 24px;
   font-size: 15px;
-  color: #111827; /* 모두 검정색 */
+  color: #111827;
+  /* 모두 검정색 */
 }
 
 .specific-table thead tr {
@@ -794,7 +833,8 @@ body {
 .specific-info-box li {
   margin-bottom: 6px;
   font-size: 15px;
-  color: #111827; /* 검정 */
+  color: #111827;
+  /* 검정 */
 }
 
 /* 오른쪽 지도 영역 */
@@ -812,4 +852,26 @@ body {
   justify-content: center;
   color: #999999;
   font-size: 15px;
+}
+
+
+/*헤더 토글 열기*/
+.header-menu-open {
+  font-size: medium;
+  color: black;
+  width: 300px;
+  height: 100vh;
+  position: absolute;
+  right: 0px;
+  transition: 1s;
+  background-color: #ffffff;
+}
+
+/*헤더 토글 닫기*/
+.header-menu-close {
+  width: 300px;
+  height: 100vh;
+  position: absolute;
+  right: -300px;
+  transition: 1s;
 }

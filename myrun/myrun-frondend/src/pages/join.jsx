@@ -1,154 +1,186 @@
 // src/pages/join.jsx
-import "../App.css";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function Join() {
-  const [gender, setGender] = useState("male"); // 기본값: 남자
+function Join() {
   const navigate = useNavigate();
 
-  // 파란 "회원가입 하기" 버튼 눌렀을 때
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // TODO: 여기서 실제 회원가입 API 호출할 수 있음
-    // 지금은 가입했다고 가정하고 로그인 화면으로 이동
-    navigate("/");
+  const [form, setForm] = useState({
+    id: "",
+    password: "",
+    passwordConfirm: "",
+    name: "",
+    height: "",
+    weight: "",
+    age: "",
+    gender: "male",
+  });
+
+  const [error, setError] = useState("");
+
+  // 공통 입력 핸들러
+  const handleChange = (key) => (e) => {
+    setForm((prev) => ({ ...prev, [key]: e.target.value }));
   };
 
-  // 아래 "로그인" 텍스트 눌렀을 때
-  const handleLoginClick = () => {
-    navigate("/");
+  // 숫자만 허용하는 입력 핸들러 (키/몸무게/나이용)
+  const handleNumberChange = (key) => (e) => {
+    const onlyDigits = e.target.value.replace(/[^0-9]/g, ""); // 숫자 아닌 건 제거
+    setForm((prev) => ({ ...prev, [key]: onlyDigits }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setError("");
+
+    // 1) 비밀번호 일치 여부 체크
+    if (form.password !== form.passwordConfirm) {
+      setError("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+      return;
+    }
+
+    // 2) 키/몸무게/나이 빈 값 체크 (필요하면)
+    if (!form.height || !form.weight || !form.age) {
+      setError("키, 몸무게, 나이를 모두 입력해주세요.");
+      return;
+    }
+
+    // TODO: 실제 회원가입 로직 (API 호출 등)
+    // 일단은 성공했다고 가정
+    alert("회원가입이 완료되었습니다!");
+    navigate("/"); // 로그인 페이지로 이동
   };
 
   return (
     <div className="join-page">
       <div className="join-panel">
         <h1 className="logo">MyRun</h1>
-        <p className="subtitle">회원 가입</p>
+        <p className="subtitle">회원가입</p>
+
+        {/* 에러 메세지 */}
+        {error && (
+          <div
+            style={{
+              marginBottom: "16px",
+              color: "#ef4444",
+              fontSize: "14px",
+            }}
+          >
+            {error}
+          </div>
+        )}
 
         <form className="join-form" onSubmit={handleSubmit}>
           {/* 아이디 */}
           <div className="form-row">
-            <label className="field-label" htmlFor="join-email">
-              아이디
-            </label>
+            <label className="field-label">아이디</label>
             <input
-              id="join-email"
-              type="email"
               className="field-input"
-              placeholder="아이디를 입력하세요"
+              value={form.id}
+              onChange={handleChange("id")}
             />
           </div>
 
           {/* 비밀번호 */}
           <div className="form-row">
-            <label className="field-label" htmlFor="join-password">
-              비밀번호
-            </label>
+            <label className="field-label">비밀번호</label>
             <input
-              id="join-password"
               type="password"
               className="field-input"
-              placeholder="비밀번호를 입력하세요"
+              value={form.password}
+              onChange={handleChange("password")}
             />
           </div>
 
           {/* 비밀번호 확인 */}
           <div className="form-row">
-            <label className="field-label" htmlFor="join-password-confirm">
-              비밀번호 확인
-            </label>
+            <label className="field-label">비밀번호 확인</label>
             <input
-              id="join-password-confirm"
               type="password"
               className="field-input"
-              placeholder="비밀번호를 다시 입력하세요"
+              value={form.passwordConfirm}
+              onChange={handleChange("passwordConfirm")}
             />
           </div>
 
-           {/* 키 / 몸무게 / 나이 */}
-           <div className="form-row">
-           <span className="field-label">키(cm)</span>
-           <div className="form-row-inline">
-               {/* 키 */}
-               <div className="inline-group">
-               <input
-                type="text"
-                inputMode="numeric"
-                className="small-input"
-                />
-               </div>
-
-               {/* 몸무게 */}
-               <div className="inline-group">
-               <span className="field-label small-label">몸무게(kg)</span>
-               <input
-                type="text"
-                inputMode="numeric"
-                className="small-input"
-                />
-               </div>
-
-               {/* 나이 */}
-               <div className="inline-group">
-               <span className="field-label small-label">나이</span>
-               <input
-                type="text"
-                inputMode="numeric"
-                className="small-input"
-                />
-               </div>
-           </div>
-           </div>
-
-          {/* 성별 (radio) */}
+          {/* 키 / 몸무게 / 나이 한 줄 */}
           <div className="form-row">
-            <span className="field-label">성별</span>
+            <label className="field-label">기본 정보</label>
+            <div className="form-row-inline">
+              <div className="inline-group">
+                <span className="small-label">키</span>
+                <input
+                  className="small-input"
+                  inputMode="numeric"
+                  pattern="\d*"
+                  value={form.height}
+                  onChange={handleNumberChange("height")}
+                />
+                <span>cm</span>
+              </div>
+
+              <div className="inline-group">
+                <span className="small-label">몸무게</span>
+                <input
+                  className="small-input"
+                  inputMode="numeric"
+                  pattern="\d*"
+                  value={form.weight}
+                  onChange={handleNumberChange("weight")}
+                />
+                <span>kg</span>
+              </div>
+
+              <div className="inline-group">
+                <span className="small-label">나이</span>
+                <input
+                  className="small-input"
+                  inputMode="numeric"
+                  pattern="\d*"
+                  value={form.age}
+                  onChange={handleNumberChange("age")}
+                />
+                <span>세</span>
+              </div>
+            </div>
+          </div>
+
+          {/* 성별 */}
+          <div className="form-row">
+            <label className="field-label">성별</label>
             <div className="gender-options">
               <label className="radio-wrapper">
                 <input
                   type="radio"
+                  className="gender-radio"
                   name="gender"
                   value="male"
-                  checked={gender === "male"}
-                  onChange={(e) => setGender(e.target.value)}
-                  className="gender-radio"
+                  checked={form.gender === "male"}
+                  onChange={handleChange("gender")}
                 />
                 <span>남자</span>
               </label>
-
               <label className="radio-wrapper">
                 <input
                   type="radio"
+                  className="gender-radio"
                   name="gender"
                   value="female"
-                  checked={gender === "female"}
-                  onChange={(e) => setGender(e.target.value)}
-                  className="gender-radio"
+                  checked={form.gender === "female"}
+                  onChange={handleChange("gender")}
                 />
                 <span>여자</span>
               </label>
             </div>
           </div>
 
-          {/* 파란 회원가입 버튼 */}
           <button type="submit" className="join-submit-btn">
-            회원가입 하기
+            회원가입
           </button>
         </form>
-
-        {/* 하단 로그인 링크 */}
-        <div className="join-bottom-text">
-          이미 계정이 있으신가요?
-          <button
-            type="button"
-            className="join-bottom-link"
-            onClick={handleLoginClick}
-          >
-            로그인
-          </button>
-        </div>
       </div>
     </div>
   );
 }
+
+export default Join;

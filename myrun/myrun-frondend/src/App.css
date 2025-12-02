@@ -857,21 +857,27 @@ body {
 
 /*헤더 토글 열기*/
 .header-menu-open {
-  font-size: medium;
-  color: black;
-  width: 300px;
-  height: 100vh;
+  
   position: absolute;
-  right: 0px;
-  transition: 1s;
+  padding: 20px ;
+  width: 280px;
+  height: 75vh;
+  right: 0;
   background-color: #ffffff;
 }
 
-/*헤더 토글 닫기*/
-.header-menu-close {
-  width: 300px;
-  height: 100vh;
-  position: absolute;
-  right: -300px;
-  transition: 1s;
+.menu-list{
+  display: block;
+  font-size: 20px;
+  padding: 14px 12px;
+  color: #111827;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+
+.menu-list:hover {
+  background-color: #f5f5f5;
+  color: #4c8dff;
 }

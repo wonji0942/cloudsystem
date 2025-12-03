@@ -15,8 +15,25 @@ export default function Recommend() {
         level: 3,
       };
       const map = new window.kakao.maps.Map(container, options);
+
+      var linePath = [
+        new window.kakao.maps.LatLng(37.550229, 126.972475),
+        new window.kakao.maps.LatLng(37.547639, 126.966888),
+        new window.kakao.maps.LatLng(37.545419, 126.964649)
+      ]; //예시... 선그리기 좌표를 저장할 배열. 추후 백엔드에서 받아온 좌표로 선 그리기
+
+      var polyline = new window.kakao.maps.Polyline({
+        path: linePath, // 선을 구성하는 좌표
+        strokeWeight: 5,
+        strokeColor: '#535bf2;',
+        strokeOpacity: 0.7,
+        strokeStyle: 'solid' //선의 특징
+      });
+
+      polyline.setMap(map); // 지도에 선을 표시
     }
   }, []);
+
 
 
   return (
@@ -27,7 +44,7 @@ export default function Recommend() {
           {/* 왼쪽: 지도 영역 */}
           <section className="recommend-map">
             <div className="map-placeholder">
-              <div id="map" style={{width:"100%", height:"400px"}}></div> {/* 카카오 지도 연동 */}
+              <div id="map" style={{ width: "100%", height: "400px" }}></div> {/* 카카오 지도 연동 */}
             </div>
           </section>
           {/* 오른쪽: 필터 + 코스 리스트 */}

@@ -8,9 +8,14 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start": "react-scripts start"
+    "start": "BROWSER=none react-scripts start"
   },
   "dependencies": {
+    "@babel/core": "^7.28.5",
+    "@babel/preset-react": "^7.28.5",
+    "@babel/register": "^7.28.3",
+    "babel": "^5.8.38",
+    "curl": "^0.1.4",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-kakao-maps-sdk": "^1.2.0",

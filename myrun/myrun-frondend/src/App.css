@@ -697,11 +697,8 @@ body {
   height: 140px;
   border-radius: 14px;
   background-color: #f7f7f7;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #b0b0b0;
-  font-size: 14px;
+  padding: 8px;             /* 그래프 안쪽 여백 */
+  display: block;           /* flex → block 으로 바꿔도 됨 */
 }
 
 /* 아래쪽 표 */

@@ -18,9 +18,9 @@ const Header = () => {
   };
 
   const handleLogout = () => {
-    clearAuth();
+    clearAuth();        // ✅ 토큰 + 유저 정보 삭제
     closeMenu();
-    navigate("/");
+    navigate("/");      // 로그인 페이지로 이동
   };
 
   // 로그인/회원가입 페이지에서는 헤더 숨김
@@ -32,19 +32,43 @@ const Header = () => {
   return (
     <>
       <header className="main-header">
+        {/* 왼쪽 로고 */}
         <div className="main-header-logo" onClick={() => go("/main")}>
           MyRun
         </div>
-        <div className="main-header-user">
-          {user ? `${user.name || user.username} 님` : ""}
+
+        {/* 오른쪽: 유저 정보 + 로그아웃 + 메뉴 버튼 */}
+        <div className="main-header-right" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <div className="main-header-user">
+            {user ? `${user.name || user.username} 님` : ""}
+          </div>
+
+          {/* ✅ 항상 보이는 로그아웃 버튼 */}
+          <button
+            className="logout-button"
+            onClick={handleLogout}
+            style={{
+              padding: "6px 10px",
+              borderRadius: "4px",
+              border: "1px solid #ddd",
+              backgroundColor: "white",
+              cursor: "pointer",
+              fontSize: "12px",
+            }}
+          >
+            로그아웃
+          </button>
+
+          {/* 기존 햄버거 메뉴 (모바일용) */}
+          <button className="main-header-menu" onClick={toggleMenu}>
+            <span />
+            <span />
+            <span />
+          </button>
         </div>
-        <button className="main-header-menu" onClick={toggleMenu}>
-          <span />
-          <span />
-          <span />
-        </button>
       </header>
 
+      {/* 햄버거 메뉴 열렸을 때 */}
       {isOpen && (
         <nav className="header-menu-open">
           <ul style={{ listStyleType: "none" }}>

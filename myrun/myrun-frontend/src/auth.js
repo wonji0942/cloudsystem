@@ -1,8 +1,10 @@
-// myrun-frontend/src/auth.js
+// src/auth.js
 
-const STORAGE_KEY = "myrunUser";
+const STORAGE_KEY = "myrunAuth";
 
-export function getCurrentUser() {
+// { token, user } 형태로 저장
+export function getAuth() {
+  if (typeof window === "undefined") return null;
   const raw = localStorage.getItem(STORAGE_KEY);
   if (!raw) return null;
   try {
@@ -12,10 +14,22 @@ export function getCurrentUser() {
   }
 }
 
-export function setCurrentUser(user) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+export function getToken() {
+  const auth = getAuth();
+  return auth?.token || null;
 }
 
-export function clearCurrentUser() {
+export function getCurrentUser() {
+  const auth = getAuth();
+  return auth?.user || null;
+}
+
+export function setAuth(auth) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(auth));
+}
+
+export function clearAuth() {
+  if (typeof window === "undefined") return;
   localStorage.removeItem(STORAGE_KEY);
 }

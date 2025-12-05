@@ -44,14 +44,23 @@ CREATE TABLE IF NOT EXISTS courses (
   description TEXT
 );
 
--- 샘플 유저 (비밀번호: 1234)
+-- 🔹 샘플 유저 (username: testuser, password: 1234)
+--   비밀번호는 bcrypt 해시 값
 INSERT INTO users (username, password, name, height_cm, weight_kg, age, gender)
-VALUES ('testuser', '1234', '테스트유저', 170, 60, 23, 'male')
+VALUES (
+  'testuser',
+  '$2b$10$pbjgA.x7Wz1QeCWPSJZywOP9XrROwDBDiZgQQn9RoYJD539MZlOsG', -- "1234"
+  '테스트유저',
+  170,
+  60,
+  23,
+  'male'
+)
 ON DUPLICATE KEY UPDATE username = username;
 
--- 샘플 러닝 기록
+-- 🔹 샘플 러닝 기록 (testuser 기준)
 INSERT INTO runs (user_id, run_date, distance_km, duration_min, avg_speed_kmh, calories, course_name, memo)
-SELECT id, '2025-11-15', 3.0, 70, 3.5, 250, '효창공원', '기본 예시 러닝'
+SELECT id, '2025-11-15', 3.0, 70, 3.5, 250, '효창공원 러닝코스', '기본 예시 러닝'
 FROM users WHERE username = 'testuser';
 
 INSERT INTO runs (user_id, run_date, distance_km, duration_min, avg_speed_kmh, calories, course_name, memo)
@@ -62,7 +71,7 @@ INSERT INTO runs (user_id, run_date, distance_km, duration_min, avg_speed_kmh, c
 SELECT id, '2025-11-07', 6.0, 255, 4.2, 500, '한강공원', '장거리 러닝'
 FROM users WHERE username = 'testuser';
 
--- 샘플 코스
+-- 🔹 서울 주요 러닝 코스 샘플
 INSERT INTO courses (name, area, distance_km, level, description)
 VALUES
 ('효창공원 러닝코스', '용산구', 3.0, '하', '숙명여대 인근, 초보자용 순환 코스'),

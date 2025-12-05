@@ -1,9 +1,9 @@
-// myrun-frontend/src/pages/main.jsx
+// src/pages/main.jsx
 import "../App.css";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { API_BASE_URL } from "../api";
-import { getCurrentUser } from "../auth";
+import { getAuth, getToken, clearAuth } from "../auth";
 
 export default function Main() {
   const navigate = useNavigate();
@@ -15,17 +15,27 @@ export default function Main() {
   });
 
   useEffect(() => {
-    const user = getCurrentUser();
-    if (!user) {
+    const auth = getAuth();
+    if (!auth?.token) {
       navigate("/");
       return;
     }
 
     async function fetchSummary() {
       try {
-        const res = await fetch(
-          `${API_BASE_URL}/api/runs/stats?userId=${user.userId}`
-        );
+        const token = getToken();
+        const res = await fetch(`${API_BASE_URL}/api/runs/stats`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (res.status === 401) {
+          clearAuth();
+          navigate("/");
+          return;
+        }
+
         const data = await res.json();
         if (data.summaryForMain) {
           setSummary(data.summaryForMain);

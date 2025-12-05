@@ -1,7 +1,7 @@
-// myrun-frontend/src/pages/header.jsx
+// src/pages/header.jsx
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { clearCurrentUser, getCurrentUser } from "../auth";
+import { clearAuth, getCurrentUser } from "../auth";
 
 const Header = () => {
   const [isOpen, setMenu] = useState(false);
@@ -18,7 +18,7 @@ const Header = () => {
   };
 
   const handleLogout = () => {
-    clearCurrentUser();
+    clearAuth();
     closeMenu();
     navigate("/");
   };

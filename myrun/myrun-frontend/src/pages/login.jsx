@@ -1,20 +1,21 @@
-// myrun-frontend/src/pages/login.jsx
+// src/pages/login.jsx
 import "../App.css";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { API_BASE_URL } from "../api";
-import { getCurrentUser, setCurrentUser } from "../auth";
+import { getAuth, setAuth } from "../auth";
 
 export default function Login() {
   const navigate = useNavigate();
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
   // 이미 로그인된 상태면 메인으로
   useEffect(() => {
-    const user = getCurrentUser();
-    if (user) {
+    const auth = getAuth();
+    if (auth?.token) {
       navigate("/main");
     }
   }, [navigate]);
@@ -30,17 +31,17 @@ export default function Login() {
         body: JSON.stringify({ username, password }),
       });
 
+      const data = await res.json();
+
       if (!res.ok) {
-        const data = await res.json();
         setError(data.message || "로그인 실패");
         return;
       }
 
-      const data = await res.json();
-      setCurrentUser({
-        userId: data.userId,
-        username: data.username,
-        name: data.name,
+      // 토큰 + 유저 정보 저장
+      setAuth({
+        token: data.token,
+        user: data.user,
       });
 
       navigate("/main");

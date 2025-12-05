@@ -1,9 +1,9 @@
-// myrun-frontend/src/pages/record.jsx
+// src/pages/record.jsx
 import "../App.css";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { API_BASE_URL } from "../api";
-import { getCurrentUser } from "../auth";
+import { getAuth, getToken, clearAuth } from "../auth";
 
 export default function Record() {
   const navigate = useNavigate();
@@ -16,6 +16,13 @@ export default function Record() {
   });
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    const auth = getAuth();
+    if (!auth?.token) {
+      navigate("/");
+    }
+  }, [navigate]);
+
   const handleChange = (key) => (e) => {
     setForm((prev) => ({ ...prev, [key]: e.target.value }));
   };
@@ -24,9 +31,10 @@ export default function Record() {
     e.preventDefault();
     setError("");
 
-    const user = getCurrentUser();
-    if (!user) {
+    const auth = getAuth();
+    if (!auth?.token) {
       setError("로그인이 필요합니다.");
+      navigate("/");
       return;
     }
 
@@ -39,11 +47,14 @@ export default function Record() {
     const distanceNum = Number(form.distance);
 
     try {
+      const token = getToken();
       const res = await fetch(`${API_BASE_URL}/api/runs`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
-          userId: user.userId,
           runDate: form.date,
           distanceKm: distanceNum,
           durationMin,
@@ -52,8 +63,15 @@ export default function Record() {
         }),
       });
 
+      if (res.status === 401) {
+        clearAuth();
+        navigate("/");
+        return;
+      }
+
+      const data = await res.json();
+
       if (!res.ok) {
-        const data = await res.json();
         setError(data.message || "저장 실패");
         return;
       }

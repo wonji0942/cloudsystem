@@ -1,9 +1,9 @@
-// myrun-frontend/src/pages/mypage.jsx
+// src/pages/mypage.jsx
 import React, { useEffect, useState } from "react";
 import "../App.css";
 import { useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../api";
-import { getCurrentUser } from "../auth";
+import { getAuth, getToken, clearAuth } from "../auth";
 import {
   LineChart,
   Line,
@@ -22,18 +22,29 @@ export default function MyPage() {
   });
 
   useEffect(() => {
-    const user = getCurrentUser();
-    if (!user) {
+    const auth = getAuth();
+    if (!auth?.token) {
       navigate("/");
       return;
     }
 
     async function fetchData() {
       try {
+        const token = getToken();
         const [runsRes, statsRes] = await Promise.all([
-          fetch(`${API_BASE_URL}/api/runs?userId=${user.userId}`),
-          fetch(`${API_BASE_URL}/api/runs/stats?userId=${user.userId}`),
+          fetch(`${API_BASE_URL}/api/runs`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch(`${API_BASE_URL}/api/runs/stats`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
         ]);
+
+        if (runsRes.status === 401 || statsRes.status === 401) {
+          clearAuth();
+          navigate("/");
+          return;
+        }
 
         const runsData = await runsRes.json();
         const statsData = await statsRes.json();
@@ -48,7 +59,7 @@ export default function MyPage() {
     fetchData();
   }, [navigate]);
 
-  const { monthDistanceData, weekDistanceData } = stats;
+  const { monthDistanceData = [], weekDistanceData = [] } = stats;
 
   const paceData = [
     { name: "1km", pace: 7.2 },

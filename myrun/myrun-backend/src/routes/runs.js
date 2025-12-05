@@ -2,40 +2,17 @@
 const express = require("express");
 const pool = require("../db");
 const { buildStatsFromRuns } = require("../utils/stats");
+const auth = require("../middleware/auth");
 
 const router = express.Router();
 
-// 🔹 항상 사용할 "기본 유저" 이름 (과제/데모용)
-const DEFAULT_USERNAME = "testuser";
+// 🔐 이 라우터 이하 모든 API는 로그인 필요
+router.use(auth);
 
-/**
- * 기본 유저(testuser)의 id를 가져온다.
- * - 없으면 새로 만들어서 id 반환
- */
-async function getDefaultUserId() {
-  // 1) 이미 있는지 확인
-  const [rows] = await pool.query(
-    "SELECT id FROM users WHERE username = ? LIMIT 1",
-    [DEFAULT_USERNAME]
-  );
-  if (rows.length > 0) {
-    return rows[0].id;
-  }
-
-  // 2) 없으면 새로 생성
-  const [result] = await pool.query(
-    `INSERT INTO users (username, password, name, height_cm, weight_kg, age, gender)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    [DEFAULT_USERNAME, "1234", "기본유저", 170, 60, 25, "male"]
-  );
-  return result.insertId;
-}
-
-// POST /api/runs  - 러닝 기록 저장
+// POST /api/runs  - 러닝 기록 저장 (로그인한 사용자 기준)
 router.post("/", async (req, res) => {
   try {
-    // 🔹 항상 기본 유저 기준으로 저장
-    const userId = await getDefaultUserId();
+    const userId = req.user.id;
 
     const {
       runDate,
@@ -74,10 +51,10 @@ router.post("/", async (req, res) => {
   }
 });
 
-// GET /api/runs  - 목록
+// GET /api/runs  - 내 러닝 기록 목록
 router.get("/", async (req, res) => {
   try {
-    const userId = await getDefaultUserId();
+    const userId = req.user.id;
 
     const [rows] = await pool.query(
       `SELECT id, run_date, distance_km, duration_min, avg_speed_kmh, calories, course_name, memo
@@ -86,6 +63,7 @@ router.get("/", async (req, res) => {
        ORDER BY run_date DESC`,
       [userId]
     );
+
     res.json(rows);
   } catch (err) {
     console.error("list runs error:", err);
@@ -93,10 +71,10 @@ router.get("/", async (req, res) => {
   }
 });
 
-// GET /api/runs/stats  - 통계
+// GET /api/runs/stats  - 내 러닝 통계
 router.get("/stats", async (req, res) => {
   try {
-    const userId = await getDefaultUserId();
+    const userId = req.user.id;
 
     const [rows] = await pool.query(
       `SELECT run_date, distance_km, duration_min, avg_speed_kmh, calories
@@ -114,7 +92,7 @@ router.get("/stats", async (req, res) => {
   }
 });
 
-// GET /api/runs/:id  - 상세
+// GET /api/runs/:id  - 내 특정 기록 상세
 router.get("/:id", async (req, res) => {
   const runId = Number(req.params.id);
   if (!runId) {
@@ -122,7 +100,7 @@ router.get("/:id", async (req, res) => {
   }
 
   try {
-    const userId = await getDefaultUserId();
+    const userId = req.user.id;
 
     const [rows] = await pool.query(
       `SELECT id, run_date, distance_km, duration_min, avg_speed_kmh,

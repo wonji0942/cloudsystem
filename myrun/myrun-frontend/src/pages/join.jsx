@@ -1,6 +1,7 @@
 // src/pages/join.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../api";
 
 function Join() {
   const navigate = useNavigate();
@@ -18,17 +19,14 @@ function Join() {
 
   const [error, setError] = useState("");
 
-  // 공통 입력 핸들러
   const handleChange = (key) => (e) => {
     setForm((prev) => ({ ...prev, [key]: e.target.value }));
   };
 
-  // 숫자만 허용하는 입력 핸들러 (키/몸무게/나이용)
   const handleNumberChange = (key) => (e) => {
-    const onlyDigits = e.target.value.replace(/[^0-9]/g, ""); // 숫자 아닌 건 제거
+    const onlyDigits = e.target.value.replace(/[^0-9]/g, "");
     setForm((prev) => ({ ...prev, [key]: onlyDigits }));
   };
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -51,6 +49,7 @@ function Join() {
         body: JSON.stringify({
           username: form.id,
           password: form.password,
+          name: form.name,
           height: Number(form.height),
           weight: Number(form.weight),
           age: Number(form.age),
@@ -58,27 +57,27 @@ function Join() {
         }),
       });
 
+      const data = await res.json();
+
       if (!res.ok) {
-        const data = await res.json();
         setError(data.message || "회원가입 실패");
         return;
       }
 
-      alert("회원가입이 완료되었습니다!");
+      alert("회원가입이 완료되었습니다! 로그인해 주세요.");
       navigate("/");
     } catch (err) {
       console.error(err);
       setError("서버에 연결할 수 없습니다.");
     }
   };
-  
+
   return (
     <div className="join-page">
       <div className="join-panel">
         <h1 className="logo">MyRun</h1>
         <p className="subtitle">회원가입</p>
 
-        {/* 에러 메세지 */}
         {error && (
           <div
             style={{
@@ -99,6 +98,16 @@ function Join() {
               className="field-input"
               value={form.id}
               onChange={handleChange("id")}
+            />
+          </div>
+
+          {/* 이름 */}
+          <div className="form-row">
+            <label className="field-label">이름</label>
+            <input
+              className="field-input"
+              value={form.name}
+              onChange={handleChange("name")}
             />
           </div>
 
@@ -124,7 +133,7 @@ function Join() {
             />
           </div>
 
-          {/* 키 / 몸무게 / 나이 한 줄 */}
+          {/* 기본 정보 */}
           <div className="form-row">
             <label className="field-label">기본 정보</label>
             <div className="form-row-inline">

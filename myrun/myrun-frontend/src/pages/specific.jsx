@@ -1,9 +1,9 @@
-// myrun-frontend/src/pages/specific.jsx
+// src/pages/specific.jsx
 import React, { useEffect, useState } from "react";
 import "../App.css";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../api";
-import { getCurrentUser } from "../auth";
+import { getAuth, getToken, clearAuth } from "../auth";
 
 function useQuery() {
   const { search } = useLocation();
@@ -12,19 +12,38 @@ function useQuery() {
 
 export default function SpecificPage() {
   const query = useQuery();
+  const navigate = useNavigate();
   const runId = query.get("id");
   const [run, setRun] = useState(null);
 
   useEffect(() => {
-    const user = getCurrentUser();
-    if (!user || !runId) return;
+    const auth = getAuth();
+    if (!auth?.token) {
+      navigate("/");
+      return;
+    }
+
+    if (!runId) return;
 
     async function fetchRun() {
       try {
-        const res = await fetch(
-          `${API_BASE_URL}/api/runs/${runId}?userId=${user.userId}`
-        );
+        const token = getToken();
+        const res = await fetch(`${API_BASE_URL}/api/runs/${runId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (res.status === 401) {
+          clearAuth();
+          navigate("/");
+          return;
+        }
+
         const data = await res.json();
+        if (!res.ok) {
+          console.error(data);
+          return;
+        }
+
         setRun(data);
       } catch (err) {
         console.error(err);
@@ -32,9 +51,9 @@ export default function SpecificPage() {
     }
 
     fetchRun();
-  }, [runId]);
+  }, [navigate, runId]);
 
-  // 지도 - 예시 마커
+  // 지도 - 예시 마커(지도 로직은 이전과 동일)
   useEffect(() => {
     if (window.kakao && window.kakao.maps) {
       const container = document.getElementById("map");
@@ -51,7 +70,6 @@ export default function SpecificPage() {
       const marker = new window.kakao.maps.Marker({
         position: markerPosition,
       });
-
       marker.setMap(map);
     }
   }, []);

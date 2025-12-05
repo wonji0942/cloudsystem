@@ -16,6 +16,7 @@ export default function SpecificPage() {
   const runId = query.get("id");
   const [run, setRun] = useState(null);
 
+  // 로그인 + 데이터 로드
   useEffect(() => {
     const auth = getAuth();
     if (!auth?.token) {
@@ -53,26 +54,94 @@ export default function SpecificPage() {
     fetchRun();
   }, [navigate, runId]);
 
-  // 지도 - 예시 마커(지도 로직은 이전과 동일)
+  // 지도: 저장된 경로(또는 start/end) 기반으로 표시
   useEffect(() => {
-    if (window.kakao && window.kakao.maps) {
-      const container = document.getElementById("map");
-      const options = {
-        center: new window.kakao.maps.LatLng(37.545419, 126.964649),
-        level: 3,
-      };
-      const map = new window.kakao.maps.Map(container, options);
-
-      const markerPosition = new window.kakao.maps.LatLng(
-        37.545419,
-        126.964649
-      );
-      const marker = new window.kakao.maps.Marker({
-        position: markerPosition,
-      });
-      marker.setMap(map);
+    if (!run) return;
+    if (!window.kakao || !window.kakao.maps) {
+      console.warn("카카오 지도 스크립트가 로드되지 않았습니다.");
+      return;
     }
-  }, []);
+
+    const { kakao } = window;
+    const container = document.getElementById("map");
+    if (!container) return;
+
+    // 기본 중심: 숙대 근처
+    let centerLat = 37.545419;
+    let centerLng = 126.964649;
+
+    if (run.start_lat != null && run.start_lng != null) {
+      centerLat = Number(run.start_lat);
+      centerLng = Number(run.start_lng);
+    }
+
+    const map = new kakao.maps.Map(container, {
+      center: new kakao.maps.LatLng(centerLat, centerLng),
+      level: 4,
+    });
+
+    const bounds = new kakao.maps.LatLngBounds();
+
+    // 시작/도착 마커
+    if (run.start_lat != null && run.start_lng != null) {
+      const startPos = new kakao.maps.LatLng(
+        Number(run.start_lat),
+        Number(run.start_lng)
+      );
+      const startMarker = new kakao.maps.Marker({
+        position: startPos,
+      });
+      startMarker.setMap(map);
+      bounds.extend(startPos);
+    }
+
+    if (run.end_lat != null && run.end_lng != null) {
+      const endPos = new kakao.maps.LatLng(
+        Number(run.end_lat),
+        Number(run.end_lng)
+      );
+      const endMarker = new kakao.maps.Marker({
+        position: endPos,
+      });
+      endMarker.setMap(map);
+      bounds.extend(endPos);
+    }
+
+    // 경로(Polyline)
+    let path = [];
+
+    if (Array.isArray(run.path) && run.path.length >= 2) {
+      path = run.path.map(
+        (p) => new kakao.maps.LatLng(Number(p.lat), Number(p.lng))
+      );
+    } else if (
+      run.start_lat != null &&
+      run.start_lng != null &&
+      run.end_lat != null &&
+      run.end_lng != null
+    ) {
+      path = [
+        new kakao.maps.LatLng(Number(run.start_lat), Number(run.start_lng)),
+        new kakao.maps.LatLng(Number(run.end_lat), Number(run.end_lng)),
+      ];
+    }
+
+    if (path.length >= 2) {
+      const polyline = new kakao.maps.Polyline({
+        path,
+        strokeWeight: 5,
+        strokeColor: "#535bf2",
+        strokeOpacity: 0.9,
+        strokeStyle: "solid",
+      });
+      polyline.setMap(map);
+
+      path.forEach((p) => bounds.extend(p));
+      map.setBounds(bounds);
+    } else if (!bounds.isEmpty && bounds.isEmpty?.() === false) {
+      // kakao LatLngBounds에는 isEmpty 없을 수 있으니 그냥 center 기본 유지
+    }
+  }, [run]);
 
   const dateText = run ? run.run_date : "";
   const distanceText = run ? `${run.distance_km}km` : "";
@@ -83,6 +152,7 @@ export default function SpecificPage() {
   return (
     <div className="specific-page">
       <main className="specific-main">
+        {/* 상단 요약 테이블 */}
         <section className="specific-table-section">
           <table className="specific-table">
             <thead>
@@ -106,6 +176,7 @@ export default function SpecificPage() {
           </table>
         </section>
 
+        {/* 코스 정보 + 지도 */}
         <section className="specific-info-section">
           <div className="specific-info-left">
             <div className="specific-info-title-pill">코스 정보</div>

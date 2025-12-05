@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS users (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 2) 러닝 기록 테이블
+-- 2) 러닝 기록 테이블 (✅ 경로 관련 필드 추가)
 CREATE TABLE IF NOT EXISTS runs (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
@@ -30,6 +30,11 @@ CREATE TABLE IF NOT EXISTS runs (
   calories INT NOT NULL,
   course_name VARCHAR(255),
   memo TEXT,
+  start_lat DECIMAL(10,7),
+  start_lng DECIMAL(10,7),
+  end_lat DECIMAL(10,7),
+  end_lng DECIMAL(10,7),
+  path_json TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_runs_user FOREIGN KEY (user_id) REFERENCES users(id)
 );
@@ -45,11 +50,10 @@ CREATE TABLE IF NOT EXISTS courses (
 );
 
 -- 🔹 샘플 유저 (username: testuser, password: 1234)
---   비밀번호는 bcrypt 해시 값
 INSERT INTO users (username, password, name, height_cm, weight_kg, age, gender)
 VALUES (
   'testuser',
-  '$2b$10$pbjgA.x7Wz1QeCWPSJZywOP9XrROwDBDiZgQQn9RoYJD539MZlOsG', -- "1234"
+  '$2b$10$pbjgA.x7Wz1QeCWPSJZywOP9XrROwDBDiZgQQn9RoYJD539MZlOsG', -- "1234" bcrypt 해시
   '테스트유저',
   170,
   60,
@@ -58,7 +62,7 @@ VALUES (
 )
 ON DUPLICATE KEY UPDATE username = username;
 
--- 🔹 샘플 러닝 기록 (testuser 기준)
+-- 🔹 샘플 러닝 기록 (경로 필드는 NULL)
 INSERT INTO runs (user_id, run_date, distance_km, duration_min, avg_speed_kmh, calories, course_name, memo)
 SELECT id, '2025-11-15', 3.0, 70, 3.5, 250, '효창공원 러닝코스', '기본 예시 러닝'
 FROM users WHERE username = 'testuser';

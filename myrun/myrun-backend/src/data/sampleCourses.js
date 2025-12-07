@@ -1,0 +1,298 @@
+// myrun-backend/src/data/sampleCourses.js
+
+/**
+ * distanceTag
+ *  - "short"  :  ~5km
+ *  - "middle" :  5~10km
+ *  - "long"   :  10km 이상
+ *
+ * level
+ *  - "하", "중", "상"
+ *
+ * area
+ *  - 서울시 25개 구 중 하나 (예: "영등포구", "서초구" ...)
+ *
+ * startName / endName
+ *  - 카카오 Local 검색에 그대로 넣을 키워드
+ *  - 가능하면 지하철역/공원/한강공원 이름 위주로 구성
+ */
+
+const sampleCourses = [
+  // ==== short (5km 이하) ====
+  {
+    id: "yeouido-short-1",
+    title: "여의도 한강 짧은 워밍업 코스",
+    area: "영등포구",
+    level: "하",
+    distanceTag: "short",
+    startName: "여의나루역 2번 출구",
+    endName: "여의도 한강공원 물빛광장",
+  },
+  {
+    id: "banpo-short-1",
+    title: "반포 세빛섬 ~ 잠원 한강공원 코스",
+    area: "서초구",
+    level: "하",
+    distanceTag: "short",
+    startName: "반포한강공원 세빛섬",
+    endName: "잠원한강공원",
+  },
+  {
+    id: "ttukseom-short-1",
+    title: "뚝섬 한강공원 ~ 서울숲 강변 코스",
+    area: "성동구",
+    level: "하",
+    distanceTag: "short",
+    startName: "뚝섬 한강공원 수변무대",
+    endName: "서울숲 공원",
+  },
+  {
+    id: "mangwon-short-1",
+    title: "망원 한강공원 강변 러닝",
+    area: "마포구",
+    level: "하",
+    distanceTag: "short",
+    startName: "망원한강공원 야외수영장",
+    endName: "합정역 1번 출구",
+  },
+  {
+    id: "olympic-short-1",
+    title: "올림픽공원 평화의문 ~ 88호수 산책 코스",
+    area: "송파구",
+    level: "하",
+    distanceTag: "short",
+    startName: "올림픽공원 평화의문",
+    endName: "올림픽공원 88호수",
+  },
+  {
+    id: "seokchon-short-1",
+    title: "석촌호수 한 바퀴 러닝",
+    area: "송파구",
+    level: "하",
+    distanceTag: "short",
+    startName: "석촌호수 서호",
+    endName: "석촌호수 동호",
+  },
+  {
+    id: "seongsu-short-1",
+    title: "서울숲 ~ 응봉산 전망 러닝",
+    area: "성동구",
+    level: "중",
+    distanceTag: "short",
+    startName: "서울숲 공원",
+    endName: "응봉산 팔각정",
+  },
+  {
+    id: "cheonggye-short-1",
+    title: "청계광장 ~ 종로5가 청계천 코스",
+    area: "종로구",
+    level: "하",
+    distanceTag: "short",
+    startName: "청계천 청계광장",
+    endName: "종로5가역 1번 출구",
+  },
+  {
+    id: "yangjae-short-1",
+    title: "양재천 시민의숲 산책 러닝",
+    area: "서초구",
+    level: "하",
+    distanceTag: "short",
+    startName: "양재시민의숲역 3번 출구",
+    endName: "양재천 시민의숲",
+  },
+  {
+    id: "gyunguiseon-short-1",
+    title: "연남동 경의선숲길 코스",
+    area: "마포구",
+    level: "하",
+    distanceTag: "short",
+    startName: "경의선숲길 연남동",
+    endName: "홍대입구역 3번 출구",
+  },
+
+  // ==== middle (5~10km) ====
+  {
+    id: "yeouido-middle-1",
+    title: "여의도 ~ 이촌 한강공원 강변 코스",
+    area: "용산구",
+    level: "중",
+    distanceTag: "middle",
+    startName: "여의도 한강공원 물빛광장",
+    endName: "이촌한강공원 자전거대여소",
+  },
+  {
+    id: "banpo-middle-1",
+    title: "반포 세빛섬 ~ 이촌 한강공원",
+    area: "용산구",
+    level: "중",
+    distanceTag: "middle",
+    startName: "반포한강공원 세빛섬",
+    endName: "이촌한강공원 음악분수",
+  },
+  {
+    id: "ttukseom-middle-1",
+    title: "뚝섬 한강공원 ~ 잠실대교 북단 러닝",
+    area: "광진구",
+    level: "중",
+    distanceTag: "middle",
+    startName: "뚝섬 한강공원",
+    endName: "잠실대교 북단",
+  },
+  {
+    id: "jamsil-middle-1",
+    title: "잠실 종합운동장 ~ 석촌호수 러닝",
+    area: "송파구",
+    level: "중",
+    distanceTag: "middle",
+    startName: "잠실종합운동장역 8번 출구",
+    endName: "석촌호수 서호",
+  },
+  {
+    id: "nanji-middle-1",
+    title: "난지 ~ 망원 한강공원 연결 코스",
+    area: "마포구",
+    level: "중",
+    distanceTag: "middle",
+    startName: "난지한강공원",
+    endName: "망원한강공원",
+  },
+  {
+    id: "worldcup-middle-1",
+    title: "월드컵경기장 ~ 노을공원 언덕 코스",
+    area: "마포구",
+    level: "중",
+    distanceTag: "middle",
+    startName: "월드컵경기장역 2번 출구",
+    endName: "노을공원 입구",
+  },
+  {
+    id: "dreamforest-middle-1",
+    title: "북서울꿈의숲 언덕 러닝 코스",
+    area: "강북구",
+    level: "중",
+    distanceTag: "middle",
+    startName: "북서울꿈의숲",
+    endName: "솔샘역 1번 출구",
+  },
+  {
+    id: "anyang-middle-1",
+    title: "오목교 ~ 목동운동장 안양천 러닝",
+    area: "양천구",
+    level: "하",
+    distanceTag: "middle",
+    startName: "오목교역 2번 출구",
+    endName: "목동운동장",
+  },
+  {
+    id: "jungnang-middle-1",
+    title: "중랑천 체육공원 ~ 용마폭포공원 코스",
+    area: "중랑구",
+    level: "중",
+    distanceTag: "middle",
+    startName: "중랑천 체육공원",
+    endName: "용마폭포공원",
+  },
+  {
+    id: "boramae-middle-1",
+    title: "보라매공원 ~ 신대방삼거리역 러닝",
+    area: "동작구",
+    level: "하",
+    distanceTag: "middle",
+    startName: "보라매공원 중앙광장",
+    endName: "신대방삼거리역 3번 출구",
+  },
+
+  // ==== long (10km 이상) ====
+  {
+    id: "yeouido-long-1",
+    title: "여의도 ~ 반포 한강 장거리 코스",
+    area: "영등포구",
+    level: "중",
+    distanceTag: "long",
+    startName: "여의도 한강공원 물빛광장",
+    endName: "반포한강공원 세빛섬",
+  },
+  {
+    id: "ttukseom-long-1",
+    title: "뚝섬 ~ 잠실 한강공원 장거리 코스",
+    area: "광진구",
+    level: "중",
+    distanceTag: "long",
+    startName: "뚝섬 한강공원",
+    endName: "잠실한강공원",
+  },
+  {
+    id: "nanji-long-1",
+    title: "난지 ~ 여의도 한강 장거리 코스",
+    area: "마포구",
+    level: "중",
+    distanceTag: "long",
+    startName: "난지한강공원",
+    endName: "여의나루역 2번 출구",
+  },
+  {
+    id: "jamsil-long-1",
+    title: "잠실 한강공원 ~ 올림픽공원 장거리",
+    area: "송파구",
+    level: "중",
+    distanceTag: "long",
+    startName: "잠실한강공원",
+    endName: "올림픽공원 평화의문",
+  },
+  {
+    id: "seongsu-long-1",
+    title: "서울숲 ~ 반포 세빛섬 한강 장거리",
+    area: "성동구",
+    level: "상",
+    distanceTag: "long",
+    startName: "서울숲 공원",
+    endName: "반포한강공원 세빛섬",
+  },
+  {
+    id: "gwangnaru-long-1",
+    title: "광나루 ~ 잠실 한강공원 장거리 코스",
+    area: "강동구",
+    level: "중",
+    distanceTag: "long",
+    startName: "광나루한강공원",
+    endName: "잠실한강공원",
+  },
+  {
+    id: "tancheon-long-1",
+    title: "탄천 종합운동장교 ~ 양재천 시민의숲",
+    area: "강남구",
+    level: "중",
+    distanceTag: "long",
+    startName: "탄천 종합운동장교",
+    endName: "양재천 시민의숲",
+  },
+  {
+    id: "gwanak-long-1",
+    title: "서울대입구 ~ 낙성대공원 언덕 코스",
+    area: "관악구",
+    level: "상",
+    distanceTag: "long",
+    startName: "서울대입구역 3번 출구",
+    endName: "낙성대공원",
+  },
+  {
+    id: "dobong-long-1",
+    title: "도봉산역 ~ 북한산우이역 트레일",
+    area: "도봉구",
+    level: "상",
+    distanceTag: "long",
+    startName: "도봉산역 1번 출구",
+    endName: "북한산우이역",
+  },
+  {
+    id: "woojang-long-1",
+    title: "우장산공원 ~ 화곡역 업다운 코스",
+    area: "강서구",
+    level: "중",
+    distanceTag: "long",
+    startName: "우장산공원 정상",
+    endName: "화곡역 1번 출구",
+  },
+];
+
+module.exports = sampleCourses;

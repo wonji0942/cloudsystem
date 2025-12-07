@@ -121,15 +121,6 @@ const sampleCourses = [
     endName: "이촌한강공원 자전거대여소",
   },
   {
-    id: "banpo-middle-1",
-    title: "반포 세빛섬 ~ 이촌 한강공원",
-    area: "용산구",
-    level: "중",
-    distanceTag: "middle",
-    startName: "반포한강공원 세빛섬",
-    endName: "이촌한강공원 음악분수",
-  },
-  {
     id: "ttukseom-middle-1",
     title: "뚝섬 한강공원 ~ 잠실대교 북단 러닝",
     area: "광진구",
@@ -256,15 +247,6 @@ const sampleCourses = [
     distanceTag: "long",
     startName: "광나루한강공원",
     endName: "잠실한강공원",
-  },
-  {
-    id: "tancheon-long-1",
-    title: "탄천 종합운동장교 ~ 양재천 시민의숲",
-    area: "강남구",
-    level: "중",
-    distanceTag: "long",
-    startName: "탄천 종합운동장교",
-    endName: "양재천 시민의숲",
   },
   {
     id: "gwanak-long-1",

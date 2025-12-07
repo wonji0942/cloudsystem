@@ -51,6 +51,7 @@ const Header = () => {
               padding: "6px 10px",
               borderRadius: "4px",
               border: "1px solid #ddd",
+              color: "#111827",
               backgroundColor: "white",
               cursor: "pointer",
               fontSize: "12px",

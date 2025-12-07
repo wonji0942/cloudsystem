@@ -54,6 +54,7 @@ const Header = () => {
               backgroundColor: "white",
               cursor: "pointer",
               fontSize: "12px",
+              color: "#111827"
             }}
           >
             로그아웃

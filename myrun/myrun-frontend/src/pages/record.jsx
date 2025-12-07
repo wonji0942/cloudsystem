@@ -17,14 +17,17 @@ export default function Record() {
   });
   const [error, setError] = useState("");
 
-  // 지도 관련 상태
+  // 지도 / 경로 상태
   const [routeInfo, setRouteInfo] = useState({
     startLat: null,
     startLng: null,
     endLat: null,
     endLng: null,
     distanceKm: null,
+    path: [], // Kakao 길찾기에서 받은 실제 경로 좌표
   });
+
+  const [routeLoading, setRouteLoading] = useState(false);
 
   const mapRef = useRef(null);
   const startMarkerRef = useRef(null);
@@ -51,7 +54,7 @@ export default function Record() {
     if (!container) return;
 
     const options = {
-      center: new kakao.maps.LatLng(37.545419, 126.964649), // 숙대 근처
+      center: new kakao.maps.LatLng(37.545419, 126.964649), // 기본 위치(숙대 근처)
       level: 5,
     };
 
@@ -73,34 +76,40 @@ export default function Record() {
           next.endLat = null;
           next.endLng = null;
           next.distanceKm = null;
+          next.path = [];
 
           // 기존 마커/라인 제거
           if (startMarkerRef.current) startMarkerRef.current.setMap(null);
           if (endMarkerRef.current) endMarkerRef.current.setMap(null);
           if (polylineRef.current) polylineRef.current.setMap(null);
 
-          startMarkerRef.current = new kakao.maps.Marker({
+          const startMarker = new kakao.maps.Marker({
             position: latlng,
           });
-          startMarkerRef.current.setMap(map);
+          startMarker.setMap(map);
+          startMarkerRef.current = startMarker;
+          endMarkerRef.current = null;
+          polylineRef.current = null;
 
           return next;
         }
 
-        // 2) 시작점은 있고, 도착점은 아직 없음 → 도착점 설정 + 선 그리기 + 거리 계산
+        // 2) 시작점은 있고, 도착점은 아직 없음 → 도착점 설정 + (임시) 직선 경로
         if (prev.endLat == null) {
           next.endLat = lat;
           next.endLng = lng;
 
           if (endMarkerRef.current) endMarkerRef.current.setMap(null);
-          endMarkerRef.current = new kakao.maps.Marker({
+          const endMarker = new kakao.maps.Marker({
             position: latlng,
           });
-          endMarkerRef.current.setMap(map);
+          endMarker.setMap(map);
+          endMarkerRef.current = endMarker;
 
-          // 선(path): 시작 → 도착
+          // 이전 선 제거
           if (polylineRef.current) polylineRef.current.setMap(null);
 
+          // 우선은 "직선"으로 연결해서 대략적인 거리 표시
           const linePath = [
             new kakao.maps.LatLng(prev.startLat, prev.startLng),
             new kakao.maps.LatLng(lat, lng),
@@ -120,6 +129,12 @@ export default function Record() {
           const lengthMeters = polyline.getLength(); // m 단위
           const km = (lengthMeters / 1000).toFixed(2);
           next.distanceKm = km;
+
+          // 직선 2점 경로를 기본 path 로 저장 (길찾기 실패 시 fallback)
+          next.path = [
+            { lat: prev.startLat, lng: prev.startLng },
+            { lat, lng },
+          ];
 
           // 지도의 중심/범위 조정
           const bounds = new kakao.maps.LatLngBounds();
@@ -148,6 +163,7 @@ export default function Record() {
         next.endLat = null;
         next.endLng = null;
         next.distanceKm = null;
+        next.path = [];
 
         return next;
       });
@@ -160,6 +176,122 @@ export default function Record() {
       mapRef.current = null;
     };
   }, []);
+
+  // ✅ 시작/도착 좌표가 모두 선택되면
+  //    백엔드(/api/runs/route-preview)를 호출해서
+  //    실제 도로 경로 + 거리(km)를 조회
+  useEffect(() => {
+    const { startLat, startLng, endLat, endLng } = routeInfo;
+
+    if (
+      startLat == null ||
+      startLng == null ||
+      endLat == null ||
+      endLng == null
+    ) {
+      return;
+    }
+    if (!mapRef.current) return;
+    if (!window.kakao || !window.kakao.maps) return;
+
+    const fetchRoute = async () => {
+      try {
+        setRouteLoading(true);
+        setError("");
+
+        const token = getToken();
+        const res = await fetch(`${API_BASE_URL}/api/runs/route-preview`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            startLat,
+            startLng,
+            endLat,
+            endLng,
+          }),
+        });
+
+        if (res.status === 401) {
+          clearAuth();
+          navigate("/");
+          return;
+        }
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          console.warn("route-preview failed:", data);
+          // 실패 시에는 기존 직선 경로 / 거리 그대로 사용
+          return;
+        }
+
+        const { kakao } = window;
+        const map = mapRef.current;
+
+        // 상태에 Kakao 길찾기 결과 반영
+        setRouteInfo((prev) => ({
+          ...prev,
+          distanceKm:
+            typeof data.distanceKm === "number"
+              ? data.distanceKm.toFixed(2)
+              : prev.distanceKm,
+          path:
+            Array.isArray(data.path) && data.path.length > 1
+              ? data.path
+              : prev.path,
+        }));
+
+        // 기존 선 제거
+        if (polylineRef.current) {
+          polylineRef.current.setMap(null);
+        }
+
+        const pathPoints =
+          Array.isArray(data.path) && data.path.length > 1
+            ? data.path
+            : [
+                { lat: startLat, lng: startLng },
+                { lat: endLat, lng: endLng },
+              ];
+
+        const linePath = pathPoints.map(
+          (p) => new kakao.maps.LatLng(p.lat, p.lng)
+        );
+
+        const polyline = new kakao.maps.Polyline({
+          path: linePath,
+          strokeWeight: 5,
+          strokeColor: "#535bf2",
+          strokeOpacity: 0.9,
+          strokeStyle: "solid",
+        });
+
+        polyline.setMap(map);
+        polylineRef.current = polyline;
+
+        // 지도 범위 재조정
+        const bounds = new kakao.maps.LatLngBounds();
+        linePath.forEach((p) => bounds.extend(p));
+        map.setBounds(bounds);
+      } catch (err) {
+        console.error("route-preview error:", err);
+        // 실패 시에도 직선 경로는 유지
+      } finally {
+        setRouteLoading(false);
+      }
+    };
+
+    fetchRoute();
+  }, [
+    routeInfo.startLat,
+    routeInfo.startLng,
+    routeInfo.endLat,
+    routeInfo.endLng,
+    navigate,
+  ]);
 
   // 거리 자동 계산되면 입력 폼 distance에도 반영
   useEffect(() => {
@@ -195,15 +327,28 @@ export default function Record() {
       routeInfo.startLat == null ||
       routeInfo.startLng == null ||
       routeInfo.endLat == null ||
-      routeInfo.endLng == null ||
-      !routeInfo.distanceKm
+      routeInfo.endLng == null
     ) {
       setError("지도에서 시작 지점과 도착 지점을 선택해 주세요.");
       return;
     }
 
+    if (!routeInfo.distanceKm) {
+      setError("경로 거리 계산이 완료되지 않았습니다. 지도를 다시 한 번 확인해주세요.");
+      return;
+    }
+
     const durationMin = Number(form.timeMinutes);
     const distanceNum = Number(routeInfo.distanceKm);
+
+    // 최종 path: 길찾기에서 받은 path 가 있으면 그걸, 아니면 직선 2점
+    const finalPath =
+      Array.isArray(routeInfo.path) && routeInfo.path.length > 1
+        ? routeInfo.path
+        : [
+            { lat: routeInfo.startLat, lng: routeInfo.startLng },
+            { lat: routeInfo.endLat, lng: routeInfo.endLng },
+          ];
 
     try {
       const token = getToken();
@@ -223,10 +368,7 @@ export default function Record() {
           startLng: routeInfo.startLng,
           endLat: routeInfo.endLat,
           endLng: routeInfo.endLng,
-          path: [
-            { lat: routeInfo.startLat, lng: routeInfo.startLng },
-            { lat: routeInfo.endLat, lng: routeInfo.endLng },
-          ],
+          path: finalPath,
         }),
       });
 
@@ -258,6 +400,12 @@ export default function Record() {
 
         {error && (
           <div style={{ color: "#ef4444", marginBottom: "12px" }}>{error}</div>
+        )}
+
+        {routeLoading && (
+          <div style={{ color: "#4b5563", marginBottom: "8px", fontSize: 13 }}>
+            경로를 계산하는 중입니다...
+          </div>
         )}
 
         {/* 지도 영역: 시작/도착 선택 */}

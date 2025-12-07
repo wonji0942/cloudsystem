@@ -3,219 +3,128 @@ import React, { useState, useEffect, useRef } from "react";
 import "../App.css";
 import { API_BASE_URL } from "../api";
 
-// 🔹 코스 이름별 좌표 정보
-//  - center: 지도 중심
-//  - path: 라인 그릴 좌표들
-const COURSE_COORDS = {
-  "효창공원 러닝코스": {
-    center: { lat: 37.545419, lng: 126.964649 },
-    path: [
-      [37.545419, 126.964649],
-      [37.5465, 126.9658],
-      [37.5470, 126.9635],
-      [37.545419, 126.964649],
-    ],
-  },
-  "한강 잠실 러닝코스": {
-    center: { lat: 37.516352, lng: 127.107844 },
-    path: [
-      [37.516352, 127.107844],
-      [37.5185, 127.1005],
-      [37.5210, 127.1030],
-      [37.516352, 127.107844],
-    ],
-  },
-  "한강 망원 러닝코스": {
-    center: { lat: 37.555726, lng: 126.897316 },
-    path: [
-      [37.555726, 126.897316],
-      [37.5575, 126.8930],
-      [37.5590, 126.8978],
-      [37.555726, 126.897316],
-    ],
-  },
-  "북한산 둘레길 러닝코스": {
-    center: { lat: 37.6589, lng: 126.9803 },
-    path: [
-      [37.6589, 126.9803],
-      [37.6610, 126.9780],
-      [37.6595, 126.9830],
-      [37.6589, 126.9803],
-    ],
-  },
-  "서울숲-뚝섬 순환코스": {
-    center: { lat: 37.5444, lng: 127.0377 },
-    path: [
-      [37.5444, 127.0377],
-      [37.5460, 127.0325],
-      [37.5480, 127.0390],
-      [37.5444, 127.0377],
-    ],
-  },
-  "올림픽공원 러닝코스": {
-    center: { lat: 37.5163, lng: 127.1300 },
-    path: [
-      [37.5163, 127.1300],
-      [37.5185, 127.1255],
-      [37.5200, 127.1320],
-      [37.5163, 127.1300],
-    ],
-  },
-  "여의도 한강공원 코스": {
-    center: { lat: 37.5286, lng: 126.9215 },
-    path: [
-      [37.5286, 126.9215],
-      [37.5305, 126.9180],
-      [37.5320, 126.9225],
-      [37.5286, 126.9215],
-    ],
-  },
-  "난지 한강공원 인터벌 코스": {
-    center: { lat: 37.5690, lng: 126.8740 },
-    path: [
-      [37.5690, 126.8740],
-      [37.5710, 126.8700],
-      [37.5720, 126.8760],
-      [37.5690, 126.8740],
-    ],
-  },
-  "양재천 러닝코스": {
-    center: { lat: 37.4830, lng: 127.0360 },
-    path: [
-      [37.4830, 127.0360],
-      [37.4850, 127.0320],
-      [37.4865, 127.0390],
-      [37.4830, 127.0360],
-    ],
-  },
-  "탄천 장거리 코스": {
-    center: { lat: 37.4850, lng: 127.0670 },
-    path: [
-      [37.4850, 127.0670],
-      [37.4880, 127.0600],
-      [37.4895, 127.0710],
-      [37.4850, 127.0670],
-    ],
-  },
-};
-
 export default function Recommend() {
   const [distance, setDistance] = useState("선택없음");
   const [level, setLevel] = useState("하");
-  const [area, setArea] = useState("용산구");
+  const [area, setArea] = useState("선택없음");
 
   const [courses, setCourses] = useState([]);
-  const [selectedCourseId, setSelectedCourseId] = useState(null);
-
-  const [loading, setLoading] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState(null);
   const [error, setError] = useState("");
 
-  // 🔹 카카오 지도 객체/마커/라인을 저장할 ref
+  const [routeInfo, setRouteInfo] = useState(null); // {distanceMeters, durationSeconds, path}
+
   const mapRef = useRef(null);
-  const markersRef = useRef([]);
   const polylineRef = useRef(null);
 
-  // 1) 처음 한 번만 지도 생성
+  // 1) 지도 초기화
   useEffect(() => {
     if (!window.kakao || !window.kakao.maps) {
       console.warn("카카오 지도 스크립트가 로드되지 않았습니다.");
       return;
     }
-
+    const { kakao } = window;
     const container = document.getElementById("map");
     if (!container) return;
 
-    const { kakao } = window;
     const options = {
-      center: new kakao.maps.LatLng(37.545419, 126.964649), // 기본: 숙대 근처
+      center: new kakao.maps.LatLng(37.545419, 126.964649),
       level: 7,
     };
-
-    mapRef.current = new kakao.maps.Map(container, options);
-
-    return () => {
-      mapRef.current = null;
-    };
+    const map = new kakao.maps.Map(container, options);
+    mapRef.current = map;
   }, []);
 
-  // 2) 필터 변경 시 코스 목록 로드
+  // 2) 필터 값이 바뀔 때마다 코스 목록 로드
   useEffect(() => {
     async function fetchCourses() {
-      setLoading(true);
-      setError("");
-
       try {
+        setError("");
         const params = new URLSearchParams();
-        if (distance) params.set("distanceRange", distance);
-        if (level) params.set("level", level);
-        if (area) params.set("area", area);
+        params.append("distance", distance);
+        params.append("level", level || "전체");
+        params.append("area", area);
 
-        const res = await fetch(`${API_BASE_URL}/api/courses?${params.toString()}`);
-
+        const res = await fetch(
+          `${API_BASE_URL}/api/courses?${params.toString()}`
+        );
         if (!res.ok) {
-          throw new Error(`HTTP ${res.status}`);
+          const data = await res.json().catch(() => ({}));
+          setError(data.message || "코스 정보를 불러오는 중 오류가 발생했습니다.");
+          setCourses([]);
+          setSelectedCourse(null);
+          return;
         }
 
         const data = await res.json();
         setCourses(data);
-
-        if (data.length > 0) {
-          setSelectedCourseId(data[0].id); // 첫 코스를 기본 선택
-        } else {
-          setSelectedCourseId(null);
-        }
+        setSelectedCourse(data[0] || null);
       } catch (err) {
-        console.error("코스 로딩 오류:", err);
-        setError("코스를 불러오는 중 오류가 발생했습니다.");
+        console.error(err);
+        setError("서버에 연결할 수 없습니다.");
         setCourses([]);
-        setSelectedCourseId(null);
-      } finally {
-        setLoading(false);
+        setSelectedCourse(null);
       }
     }
 
     fetchCourses();
   }, [distance, level, area]);
 
-  // 3) 코스 목록이 바뀔 때마다 → 모든 코스를 마커로 표시
+  // 3) 선택된 코스가 바뀔 때마다 카카오 길찾기 API를 통해 경로 로드
   useEffect(() => {
-    if (!window.kakao || !window.kakao.maps) return;
-    const { kakao } = window;
-    const map = mapRef.current;
-    if (!map) return;
+    async function loadRoute(course) {
+      if (!course) {
+        setRouteInfo(null);
+        return;
+      }
+      if (!mapRef.current) return;
 
-    // 기존 마커 제거
-    markersRef.current.forEach((m) => m.setMap(null));
-    markersRef.current = [];
+      try {
+        setError("");
 
-    const bounds = new kakao.maps.LatLngBounds();
+        const params = new URLSearchParams({
+          startLat: String(course.startLat),
+          startLng: String(course.startLng),
+          endLat: String(course.endLat),
+          endLng: String(course.endLng),
+        });
 
-    courses.forEach((c) => {
-      const info = COURSE_COORDS[c.name];
-      if (!info) return; // 좌표 정의 안 된 코스는 지도 표시 스킵
+        const res = await fetch(
+          `${API_BASE_URL}/api/nav/route?${params.toString()}`
+        );
 
-      const pos = new kakao.maps.LatLng(info.center.lat, info.center.lng);
-      const marker = new kakao.maps.Marker({
-        position: pos,
-      });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          console.error("route error:", data);
+          setError(
+            data.message ||
+              "경로 정보를 불러오는 중 오류가 발생했습니다. (카카오 길찾기)"
+          );
+          setRouteInfo(null);
+          drawRoute(null);
+          return;
+        }
 
-      marker.setMap(map);
-      markersRef.current.push(marker);
-      bounds.extend(pos);
-    });
-
-    // 코스가 하나 이상이면, 자동으로 모두 보이도록 영역 조정
-    if (!bounds.isEmpty()) {
-      map.setBounds(bounds);
+        const data = await res.json();
+        setRouteInfo(data);
+        drawRoute(data.path || []);
+      } catch (err) {
+        console.error(err);
+        setError("경로를 불러오는 중 서버 오류가 발생했습니다.");
+        setRouteInfo(null);
+        drawRoute(null);
+      }
     }
-  }, [courses]);
 
-  // 4) 선택된 코스가 바뀔 때마다 → 해당 코스 라인 + 중심 이동
-  useEffect(() => {
-    if (!window.kakao || !window.kakao.maps) return;
+    loadRoute(selectedCourse);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCourse]);
+
+  // 4) 지도 위에 Polyline 그리기
+  const drawRoute = (pathArray) => {
+    if (!window.kakao || !window.kakao.maps || !mapRef.current) return;
     const { kakao } = window;
     const map = mapRef.current;
-    if (!map) return;
 
     // 기존 라인 제거
     if (polylineRef.current) {
@@ -223,49 +132,76 @@ export default function Recommend() {
       polylineRef.current = null;
     }
 
-    const selectedCourse = courses.find((c) => c.id === selectedCourseId);
-    if (!selectedCourse) return;
+    if (!Array.isArray(pathArray) || pathArray.length === 0) {
+      return;
+    }
 
-    const info = COURSE_COORDS[selectedCourse.name];
-    if (!info) return;
-
-    const path = info.path.map(
-      ([lat, lng]) => new kakao.maps.LatLng(lat, lng)
+    const kakaoPath = pathArray.map(
+      (p) => new kakao.maps.LatLng(p.lat, p.lng)
     );
 
     const polyline = new kakao.maps.Polyline({
-      path,
+      path: kakaoPath,
       strokeWeight: 5,
       strokeColor: "#535bf2",
       strokeOpacity: 0.9,
       strokeStyle: "solid",
     });
-
     polyline.setMap(map);
     polylineRef.current = polyline;
 
-    // 선택 코스 중심으로 이동 + 약간 확대
-    map.setCenter(new kakao.maps.LatLng(info.center.lat, info.center.lng));
-    map.setLevel(4);
-  }, [selectedCourseId, courses]);
+    // 지도를 경로 전체가 보이도록 조정
+    const bounds = new kakao.maps.LatLngBounds();
+    kakaoPath.forEach((p) => bounds.extend(p));
+    map.setBounds(bounds);
+  };
+
+  const handleSelectCourse = (course) => {
+    setSelectedCourse(course);
+  };
+
+  // UI에 보여줄 거리(km): 가능하면 길찾기 API 결과 사용, 없으면 기존 distanceKm
+  const getDisplayDistanceKm = () => {
+    if (routeInfo && routeInfo.distanceMeters != null) {
+      return (routeInfo.distanceMeters / 1000).toFixed(2);
+    }
+    if (selectedCourse && selectedCourse.distanceKm != null) {
+      return selectedCourse.distanceKm.toFixed(2);
+    }
+    return "-";
+  };
 
   return (
     <div className="recommend-page">
       <main className="recommend-main">
         <div className="recommend-layout">
-          {/* 왼쪽: 지도 */}
+          {/* 왼쪽: 지도 영역 */}
           <section className="recommend-map">
             <div className="map-placeholder">
               <div
                 id="map"
-                style={{ width: "100%", height: "400px" }}
+                style={{ width: "100%", height: "400px", borderRadius: "8px" }}
               ></div>
             </div>
+            {selectedCourse && (
+              <div style={{ marginTop: "8px", fontSize: "14px" }}>
+                <strong>{selectedCourse.name}</strong> <br />
+                거리: {getDisplayDistanceKm()}km / 난이도:{" "}
+                {selectedCourse.level} / 지역: {selectedCourse.area}
+                {routeInfo && routeInfo.durationSeconds != null && (
+                  <>
+                    <br />
+                    예상 소요 시간(자동차 기준):{" "}
+                    {Math.round(routeInfo.durationSeconds / 60)}분
+                  </>
+                )}
+              </div>
+            )}
           </section>
 
-          {/* 오른쪽: 필터 + 리스트 */}
+          {/* 오른쪽: 필터 + 코스 리스트 */}
           <aside className="recommend-side">
-            {/* 🔹 필터 영역 */}
+            {/* 🔹 필터 줄 */}
             <div className="recommend-filters">
               {/* 거리 */}
               <div className="filter-group">
@@ -297,6 +233,7 @@ export default function Recommend() {
                     <option value="하">하</option>
                     <option value="중">중</option>
                     <option value="상">상</option>
+                    <option value="전체">전체</option>
                   </select>
                   <span className="filter-select-arrow">▾</span>
                 </div>
@@ -312,6 +249,7 @@ export default function Recommend() {
                     onChange={(e) => setArea(e.target.value)}
                   >
                     <option value="선택없음">선택없음</option>
+                    {/* 서울시 25개 구 */}
                     <option value="강남구">강남구</option>
                     <option value="강동구">강동구</option>
                     <option value="강북구">강북구</option>
@@ -343,58 +281,46 @@ export default function Recommend() {
               </div>
             </div>
 
+            {/* 🔹 에러 표시 */}
+            {error && (
+              <div
+                style={{
+                  color: "#ef4444",
+                  marginBottom: "8px",
+                  fontSize: "13px",
+                }}
+              >
+                {error}
+              </div>
+            )}
+
             {/* 🔹 코스 리스트 */}
             <div className="recommend-list">
-              {loading && (
-                <div style={{ padding: "8px", fontSize: "14px" }}>
-                  코스를 불러오는 중입니다...
+              {courses.length === 0 && !error && (
+                <div style={{ fontSize: "13px", padding: "8px" }}>
+                  조건에 맞는 코스가 없습니다.
                 </div>
               )}
 
-              {!loading && error && (
+              {courses.map((course) => (
                 <div
-                  style={{
-                    padding: "8px",
-                    fontSize: "14px",
-                    color: "#ef4444",
-                  }}
+                  key={course.id}
+                  className={
+                    "course-row" +
+                    (selectedCourse && selectedCourse.id === course.id
+                      ? " course-row-active"
+                      : "")
+                  }
+                  onClick={() => handleSelectCourse(course)}
                 >
-                  {error}
+                  <span className="course-name">{course.name}</span>
+                  <span className="course-distance">
+                    {course.distanceKm.toFixed(2)}km
+                  </span>
+                  <span className="course-level">{course.level}</span>
+                  <span className="course-area">{course.area}</span>
                 </div>
-              )}
-
-              {!loading && !error && courses.length === 0 && (
-                <div style={{ padding: "8px", fontSize: "14px" }}>
-                  조건에 맞는 코스가 없습니다. 필터를 변경해 보세요.
-                </div>
-              )}
-
-              {!loading &&
-                !error &&
-                courses.map((c) => {
-                  const isActive = c.id === selectedCourseId;
-                  return (
-                    <div
-                      key={c.id}
-                      className={
-                        "course-row " + (isActive ? "course-row-active" : "")
-                      }
-                      onClick={() => setSelectedCourseId(c.id)}
-                    >
-                      <div className="course-row-main">
-                        <span className="course-name">{c.name}</span>
-                        <span className="course-distance">
-                          {c.distance_km}km
-                        </span>
-                        <span className="course-level">{c.level}</span>
-                        <span className="course-area">{c.area}</span>
-                      </div>
-                      {c.description && (
-                        <div className="course-desc">{c.description}</div>
-                      )}
-                    </div>
-                  );
-                })}
+              ))}
             </div>
           </aside>
         </div>

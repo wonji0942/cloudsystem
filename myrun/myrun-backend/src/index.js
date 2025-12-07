@@ -1,28 +1,29 @@
 // myrun-backend/src/index.js
 const express = require("express");
 const cors = require("cors");
-const dotenv = require("dotenv");
-
-const authRoutes = require("./routes/auth");
-const runRoutes = require("./routes/runs");
-const courseRoutes = require("./routes/courses");
-
-dotenv.config();
+const runsRouter = require("./routes/runs");
+const authRouter = require("./routes/auth");
+const coursesRouter = require("./routes/courses");
+const navRouter = require("./routes/nav"); // ✅ 추가
 
 const app = express();
-const port = process.env.PORT || 4000;
 
 app.use(cors());
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send("MyRun backend running");
-});
+// 인증
+app.use("/api/auth", authRouter);
 
-app.use("/api/auth", authRoutes);
-app.use("/api/runs", runRoutes);
-app.use("/api/courses", courseRoutes);
+// 러닝 기록
+app.use("/api/runs", runsRouter);
 
-app.listen(port, () => {
-  console.log(`MyRun backend listening on port ${port}`);
+// 코스 추천
+app.use("/api/courses", coursesRouter);
+
+// ✅ 길찾기(경로) API
+app.use("/api/nav", navRouter);
+
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => {
+  console.log(`MyRun backend listening on port ${PORT}`);
 });

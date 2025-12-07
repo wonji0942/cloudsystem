@@ -13,10 +13,11 @@ spec:
     metadata:
       labels:
         app: myrun-backend
+        tier: backend
     spec:
       containers:
         - name: myrun-backend
-          image: <YOUR_DOCKER_ID>/myrun-backend:latest
+          image: sje21/myrun-backend:v1
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 4000

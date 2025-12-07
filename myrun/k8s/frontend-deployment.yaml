@@ -13,13 +13,15 @@ spec:
     metadata:
       labels:
         app: myrun-frontend
+        tier: frontend
     spec:
       containers:
         - name: myrun-frontend
-          image: <YOUR_DOCKER_ID>/myrun-frontend:latest
-          imagePullPolicy: IfNotPresent
+          image: sje21/myrun-frontend:v1
+          imagePullPolicy: Always
+          
           ports:
-            - containerPort: 3000
+            - containerPort: 3000 
           resources:
             limits:
               memory: "512Mi"
@@ -27,6 +29,7 @@ spec:
             requests:
               memory: "256Mi"
               cpu: "250m"
+      
 ---
 apiVersion: v1
 kind: Service
@@ -36,6 +39,6 @@ spec:
   selector:
     app: myrun-frontend
   ports:
-    - port: 80
+    - port: 3000
       targetPort: 3000
-  type: NodePort   # minikube에서 접근하기 쉽도록
+  type: NodePort

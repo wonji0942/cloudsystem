@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myrun-mysql
+  labels:
+    app: myrun-mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: myrun-mysql
+  template:
+    metadata:
+      labels:
+        app: myrun-mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: myrun-mysql-config
+                  key: MYSQL_DATABASE
+            - name: MYSQL_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: myrun-mysql-config
+                  key: MYSQL_USER
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: myrun-mysql-secret
+                  key: MYSQL_PASSWORD
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                  name: myrun-mysql-secret
+                  key: MYSQL_ROOT_PASSWORD
+          volumeMounts:
+            - name: init-sql
+              mountPath: /docker-entrypoint-initdb.d
+      volumes:
+        - name: init-sql
+          configMap:
+            name: myrun-init-sql
+            items:
+              - key: init.sql
+                path: init.sql
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: myrun-init-sql
+data:
+  init.sql: |
+    CREATE DATABASE IF NOT EXISTS myrun
+      DEFAULT CHARACTER SET utf8mb4
+      DEFAULT COLLATE utf8mb4_general_ci;
+
+    USE myrun;
+
+    -- 1) 사용자 테이블
+    CREATE TABLE IF NOT EXISTS users (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      username VARCHAR(50) NOT NULL UNIQUE,
+      password VARCHAR(255) NOT NULL,
+      name VARCHAR(100),
+      height_cm INT,
+      weight_kg INT,
+      age INT,
+      gender ENUM('male','female') DEFAULT 'male',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+    -- 2) 러닝 기록 테이블 (✅ 경로 관련 필드 추가)
+    CREATE TABLE IF NOT EXISTS runs (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT NOT NULL,
+      run_date DATE NOT NULL,
+      distance_km DECIMAL(5,2) NOT NULL,
+      duration_min INT NOT NULL,
+      avg_speed_kmh DECIMAL(4,1) NOT NULL,
+      calories INT NOT NULL,
+      course_name VARCHAR(255),
+      memo TEXT,
+      start_lat DECIMAL(10,7),
+      start_lng DECIMAL(10,7),
+      end_lat DECIMAL(10,7),
+      end_lng DECIMAL(10,7),
+      path_json TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      CONSTRAINT fk_runs_user FOREIGN KEY (user_id) REFERENCES users(id)
+    );
+
+    -- 3) 코스 테이블
+    CREATE TABLE IF NOT EXISTS courses (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      name VARCHAR(100) NOT NULL,
+      area VARCHAR(50) NOT NULL,
+      distance_km DECIMAL(5,2) NOT NULL,
+      level ENUM('하','중','상') NOT NULL,
+      description TEXT
+    );

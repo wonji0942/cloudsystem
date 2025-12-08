@@ -48,16 +48,3 @@ CREATE TABLE IF NOT EXISTS courses (
   level ENUM('하','중','상') NOT NULL,
   description TEXT
 );
-
--- 🔹 샘플 유저 (username: testuser, password: 1234)
-INSERT INTO users (username, password, name, height_cm, weight_kg, age, gender)
-VALUES (
-  'testuser',
-  '$2b$10$pbjgA.x7Wz1QeCWPSJZywOP9XrROwDBDiZgQQn9RoYJD539MZlOsG', -- "1234" bcrypt 해시
-  '테스트유저',
-  170,
-  60,
-  23,
-  'male'
-)
-ON DUPLICATE KEY UPDATE username = username;
